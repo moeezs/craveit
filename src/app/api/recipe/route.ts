@@ -22,8 +22,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('Fetching recipe from:', `${API_BASE_URL}/api?url=${encodeURIComponent(url)}`);
-
     const response = await fetch(`${API_BASE_URL}/api?url=${encodeURIComponent(url)}`, {
       headers: {
         'User-Agent': 'CraveIt-Recipe-App/1.0',
@@ -47,7 +45,6 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('Recipe data received:', data);
 
     // Validate response has required fields
     if (!data.title || !data.ingredients || !data.steps) {
