@@ -1,103 +1,172 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { Recipe } from '@/types/recipe';
+import { fetchRecipe, validateAllRecipesUrl } from '@/lib/recipe-api';
+import { RecipeDisplay } from '@/components/recipe-display';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ChefHat, Search, AlertCircle } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [url, setUrl] = useState('');
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!url.trim()) {
+      setError('Please enter a recipe URL');
+      return;
+    }
+
+    if (!validateAllRecipesUrl(url)) {
+      setError('Please enter a valid AllRecipes.com URL');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setRecipe(null);
+
+    try {
+      const recipeData = await fetchRecipe(url);
+      setRecipe(recipeData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch recipe');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const LoadingSkeleton = () => (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-3/4 mx-auto" />
+          <div className="flex justify-center gap-4 mt-6">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+        </CardHeader>
+      </Card>
+      
+      <div className="grid lg:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-24" />
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-4 w-full" />
+            ))}
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-24" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center items-center gap-3 mb-4">
+            <ChefHat className="w-12 h-12 text-orange-600" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              CraveIt
+            </h1>
+          </div>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Transform any AllRecipes.com URL into a beautiful, organized recipe display. 
+            Just paste the link and let us do the magic!
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* URL Input Form */}
+        <Card className="max-w-2xl mx-auto mb-12">
+          <CardHeader>
+            <CardTitle className="text-center">Enter Recipe URL</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Input
+                  type="url"
+                  placeholder="https://www.allrecipes.com/recipe/..."
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="pr-12"
+                  disabled={loading}
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              </div>
+              
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loading}
+                size="lg"
+              >
+                {loading ? 'Fetching Recipe...' : 'Get Recipe'}
+              </Button>
+            </form>
+            
+            <div className="mt-4 text-sm text-muted-foreground text-center">
+              <p>💡 Tip: Copy any recipe URL from AllRecipes.com and paste it above</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recipe Display */}
+        {loading && <LoadingSkeleton />}
+        {recipe && !loading && <RecipeDisplay recipe={recipe} />}
+        
+        {/* Example URL for testing */}
+        {!recipe && !loading && (
+          <Card className="max-w-2xl mx-auto">
+            <CardContent className="pt-6">
+              <div className="text-center text-sm text-muted-foreground">
+                <p className="mb-2">📝 Try this example:</p>
+                <button
+                  onClick={() => setUrl('https://www.allrecipes.com/recipe/238654/brookies-brownie-cookies/')}
+                  className="text-blue-600 hover:text-blue-800 underline break-all"
+                >
+                  https://www.allrecipes.com/recipe/238654/brookies-brownie-cookies/
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
