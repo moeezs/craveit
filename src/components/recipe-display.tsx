@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator } from 'lucide-react';
+import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle } from 'lucide-react';
 
 interface RecipeDisplayProps {
   recipe: Recipe;
@@ -69,6 +69,8 @@ function scaleIngredient(ingredient: string, scale: number): string {
 export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
   const originalServings = parseInt(recipe.details.servings) || 1;
   const [currentServings, setCurrentServings] = useState(originalServings);
+  const [stepMode, setStepMode] = useState<'all' | 'step-by-step'>('all');
+  const [currentStep, setCurrentStep] = useState(0);
   
   const scale = currentServings / originalServings;
 
@@ -86,6 +88,22 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
   const adjustServings = (increment: number) => {
     const newServings = Math.max(1, currentServings + increment);
     setCurrentServings(newServings);
+  };
+
+  const nextStep = () => {
+    if (currentStep < recipe.steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const goToStep = (stepIndex: number) => {
+    setCurrentStep(stepIndex);
   };
 
   return (
@@ -236,29 +254,109 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
         {/* Instructions Section */}
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8">
-            <h2 className="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
-              <ChefHat className="w-6 h-6 text-orange-600" />
-              Instructions
-            </h2>
-            
-            <div className="space-y-8">
-              {recipe.steps.map((step, index) => (
-                <div key={step.step} className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
-                      {step.step}
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <ChefHat className="w-6 h-6 text-orange-600" />
+                Instructions
+              </h2>
+              
+              {/* Mode Toggle */}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={stepMode === 'all' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStepMode('all')}
+                  className="flex items-center gap-2"
+                >
+                  <List className="w-4 h-4" />
+                  All Steps
+                </Button>
+                <Button
+                  variant={stepMode === 'step-by-step' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStepMode('step-by-step')}
+                  className="flex items-center gap-2"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  Step by Step
+                </Button>
+              </div>
+            </div>
+
+            {stepMode === 'all' ? (
+              // All Steps View (Original)
+              <div className="space-y-8">
+                {recipe.steps.map((step, index) => (
+                  <div key={step.step} className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+                        {step.step}
+                      </div>
+                      <p className="text-slate-700 leading-relaxed flex-1 pt-2 font-medium text-lg">
+                        {step.instruction}
+                      </p>
                     </div>
-                    <p className="text-slate-700 leading-relaxed flex-1 pt-2 font-medium text-lg">
-                      {step.instruction}
-                    </p>
+                    
+                    {step.image && (
+                      <div className="ml-14">
+                        <img
+                          src={step.image}
+                          alt={`Step ${step.step}`}
+                          className="rounded-xl w-full max-w-md object-cover shadow-md hover:shadow-lg transition-shadow"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {index < recipe.steps.length - 1 && (
+                      <Separator className="ml-14 mt-6" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Step-by-Step View (New)
+              <div className="space-y-6">
+                {/* Progress Indicator */}
+                <div className="bg-slate-50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-slate-600">
+                      Step {currentStep + 1} of {recipe.steps.length}
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      {Math.round(((currentStep + 1) / recipe.steps.length) * 100)}% Complete
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${((currentStep + 1) / recipe.steps.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Current Step */}
+                <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-orange-200 rounded-2xl p-8 min-h-[300px]">
+                  <div className="flex items-start gap-6 mb-6">
+                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg">
+                      {recipe.steps[currentStep].step}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-slate-800 leading-relaxed text-xl font-medium">
+                        {recipe.steps[currentStep].instruction}
+                      </p>
+                    </div>
                   </div>
                   
-                  {step.image && (
-                    <div className="ml-14">
+                  {recipe.steps[currentStep].image && (
+                    <div className="flex justify-center">
                       <img
-                        src={step.image}
-                        alt={`Step ${step.step}`}
-                        className="rounded-xl w-full max-w-md object-cover shadow-md hover:shadow-lg transition-shadow"
+                        src={recipe.steps[currentStep].image}
+                        alt={`Step ${recipe.steps[currentStep].step}`}
+                        className="rounded-xl max-w-full max-h-80 object-cover shadow-lg"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
@@ -266,13 +364,58 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                       />
                     </div>
                   )}
-                  
-                  {index < recipe.steps.length - 1 && (
-                    <Separator className="ml-14 mt-6" />
-                  )}
                 </div>
-              ))}
-            </div>
+
+                {/* Navigation Controls */}
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={prevStep}
+                    disabled={currentStep === 0}
+                    className="flex items-center gap-2"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Previous
+                  </Button>
+
+                  {/* Step Dots */}
+                  <div className="flex items-center gap-2">
+                    {recipe.steps.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToStep(index)}
+                        className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                          index === currentStep 
+                            ? 'bg-orange-500 scale-125' 
+                            : index < currentStep 
+                              ? 'bg-green-400' 
+                              : 'bg-slate-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <Button
+                    variant={currentStep === recipe.steps.length - 1 ? "default" : "outline"}
+                    onClick={nextStep}
+                    disabled={currentStep === recipe.steps.length - 1}
+                    className="flex items-center gap-2"
+                  >
+                    {currentStep === recipe.steps.length - 1 ? 'Complete!' : 'Next'}
+                    {currentStep < recipe.steps.length - 1 && <ChevronRight className="w-4 h-4" />}
+                  </Button>
+                </div>
+
+                {/* Completion Message */}
+                {currentStep === recipe.steps.length - 1 && (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                    <div className="text-2xl mb-2">🎉</div>
+                    <h3 className="font-bold text-green-800 mb-2">Congratulations!</h3>
+                    <p className="text-green-700">You've completed all the steps. Enjoy your {recipe.title}!</p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
