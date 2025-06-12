@@ -1,20 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Recipe } from '@/types/recipe';
-import { fetchRecipe, validateAllRecipesUrl } from '@/lib/recipe-api';
-import { RecipeDisplay } from '@/components/recipe-display';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { validateAllRecipesUrl } from '@/lib/recipe-api';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ChefHat, Search, AlertCircle } from 'lucide-react';
+import { ChefHat, Search, AlertCircle, Sparkles, Clock, Users } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
   const [url, setUrl] = useState('');
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,181 +27,153 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
-    setError(null);
-    setRecipe(null);
-
-    try {
-      const recipeData = await fetchRecipe(url);
-      setRecipe(recipeData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch recipe');
-    } finally {
-      setLoading(false);
-    }
+    // Navigate to recipe page with URL as query parameter
+    router.push(`/recipe?url=${encodeURIComponent(url)}`);
   };
 
-  const LoadingSkeleton = () => (
-    <div className="space-y-8">
-      {/* Header skeleton */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-800">
-        <div className="text-center space-y-4">
-          <Skeleton className="h-10 w-3/4 mx-auto" />
-          <div className="flex justify-center gap-6">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-6 w-24" />
-          </div>
-          <div className="flex justify-center gap-2">
-            <Skeleton className="h-7 w-16 rounded-full" />
-            <Skeleton className="h-7 w-20 rounded-full" />
-            <Skeleton className="h-7 w-18 rounded-full" />
-          </div>
-        </div>
-      </div>
-      
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Ingredients skeleton */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-800">
-          <Skeleton className="h-8 w-32 mb-6" />
-          <div className="space-y-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <Skeleton className="h-2 w-2 rounded-full" />
-                <Skeleton className="h-4 flex-1" />
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Instructions skeleton */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg border border-gray-200 dark:border-gray-800">
-          <Skeleton className="h-8 w-32 mb-6" />
-          <div className="space-y-6">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="space-y-3">
-                <div className="flex items-start gap-4">
-                  <Skeleton className="h-8 w-8 rounded-full flex-shrink-0" />
-                  <Skeleton className="h-20 flex-1" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const exampleRecipes = [
+    {
+      title: "Brookies (Brownie Cookies)",
+      url: "https://www.allrecipes.com/recipe/238654/brookies-brownie-cookies/",
+      time: "40 mins",
+      servings: "20"
+    },
+    {
+      title: "Cheesy Chicken Broccoli Casserole", 
+      url: "https://www.allrecipes.com/recipe/213742/cheesy-chicken-broccoli-casserole/",
+      time: "45 mins",
+      servings: "6"
+    },
+    {
+      title: "Easy Meatloaf",
+      url: "https://www.allrecipes.com/recipe/16354/easy-meatloaf/",
+      time: "1 hr 15 mins",
+      servings: "8"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Hero Section */}
-      <div className="relative">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900" />
-        
-        {/* Content */}
-        <div className="relative">
-          <div className="max-w-6xl mx-auto px-6 py-16 lg:py-24">
-            {/* Header */}
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 dark:bg-orange-900/20 rounded-3xl mb-8">
-                <ChefHat className="w-10 h-10 text-orange-600 dark:text-orange-400" />
-              </div>
-              
-              <h1 className="text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-                CraveIt
-              </h1>
-              
-              <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                Transform any AllRecipes.com URL into a beautifully organized recipe.
-                <br />
-                <span className="text-gray-500 dark:text-gray-400 text-lg">
-                  Just paste, fetch, and cook.
-                </span>
-              </p>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50">
+      <div className="container mx-auto px-6 py-16">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <div className="flex justify-center items-center gap-4 mb-6">
+            <div className="relative">
+              <ChefHat className="w-16 h-16 text-orange-600" />
+              <Sparkles className="w-6 h-6 text-yellow-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-rose-600 bg-clip-text text-transparent">
+              CraveIt
+            </h1>
+          </div>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Transform any AllRecipes.com recipe into a beautiful, organized display with smart ingredient scaling.
+            <br />
+            <span className="text-lg text-slate-500">Just paste the link and let the magic begin ✨</span>
+          </p>
+        </div>
 
-            {/* URL Input Form */}
-            <div className="max-w-2xl mx-auto mb-16">
-              <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="relative">
-                    <Input
-                      type="url"
-                      placeholder="Paste your AllRecipes.com URL here..."
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      className="h-14 text-lg pl-6 pr-14 border-gray-300 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      disabled={loading}
-                    />
-                    <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" />
-                  </div>
-                  
-                  {error && (
-                    <Alert variant="destructive" className="rounded-xl">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription className="text-base">{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-14 text-lg font-medium bg-orange-600 hover:bg-orange-700 text-white rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]" 
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        Fetching Recipe...
-                      </div>
-                    ) : (
-                      'Get Recipe'
-                    )}
-                  </Button>
-                </form>
-                
-                {/* Example link */}
-                {!recipe && !loading && (
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 text-center">
-                      Try this example recipe:
-                    </p>
-                    <button
-                      onClick={() => setUrl('https://www.allrecipes.com/recipe/238654/brookies-brownie-cookies/')}
-                      className="w-full text-left p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center flex-shrink-0">
-                          <ChefHat className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                            Brookies (Brownie Cookies)
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                            allrecipes.com/recipe/238654/brookies-brownie-cookies/
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                )}
+        {/* Main Input Section */}
+        <Card className="max-w-2xl mx-auto mb-16 shadow-xl border-0 bg-white/70 backdrop-blur-sm">
+          <CardContent className="p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">
+                  Recipe URL
+                </label>
+                <div className="relative">
+                  <Input
+                    type="url"
+                    placeholder="https://www.allrecipes.com/recipe/..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="pl-12 pr-4 py-6 text-lg border-2 border-slate-200 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl"
+                  />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                </div>
               </div>
+              
+              {error && (
+                <Alert variant="destructive" className="border-red-200 bg-red-50">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-red-800">{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              <Button 
+                type="submit" 
+                className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 shadow-lg hover:shadow-xl transition-all duration-200 rounded-xl"
+                size="lg"
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                Transform Recipe
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Example Recipes */}
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">
+            ✨ Try These Popular Recipes
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {exampleRecipes.map((recipe, index) => (
+              <Card 
+                key={index}
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80"
+                onClick={() => setUrl(recipe.url)}
+              >
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-slate-800 mb-3 leading-tight">
+                    {recipe.title}
+                  </h3>
+                  <div className="flex items-center gap-4 text-sm text-slate-600">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{recipe.time}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      <span>{recipe.servings}</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 text-xs text-orange-600 font-medium">
+                    Click to try →
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="mt-20 text-center">
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="space-y-3">
+              <div className="w-12 h-12 mx-auto bg-orange-100 rounded-full flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-slate-800">Beautiful Design</h3>
+              <p className="text-sm text-slate-600">Clean, modern interface that makes cooking a joy</p>
+            </div>
+            <div className="space-y-3">
+              <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-slate-800">Smart Scaling</h3>
+              <p className="text-sm text-slate-600">Automatically adjust ingredients for any number of servings</p>
+            </div>
+            <div className="space-y-3">
+              <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                <Clock className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-slate-800">Instant Results</h3>
+              <p className="text-sm text-slate-600">Get organized recipes in seconds, not minutes</p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Recipe Display Section */}
-      {(loading || recipe) && (
-        <div className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-6xl mx-auto px-6 py-16">
-            {loading && <LoadingSkeleton />}
-            {recipe && !loading && <RecipeDisplay recipe={recipe} />}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
