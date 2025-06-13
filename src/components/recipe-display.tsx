@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Recipe } from '@/types/recipe';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle } from 'lucide-react';
+import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle, Volume2, VolumeX } from 'lucide-react';
 
 interface RecipeDisplayProps {
   recipe: Recipe;
@@ -71,8 +71,16 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
   const [currentServings, setCurrentServings] = useState(originalServings);
   const [stepMode, setStepMode] = useState<'all' | 'step-by-step'>('all');
   const [currentStep, setCurrentStep] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
   
   const scale = currentServings / originalServings;
+
+  // Check speech synthesis support
+  useEffect(() => {
+    setSpeechSupported('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window);
+  }, []);
 
   // Scale ingredients based on serving size
   const scaledIngredients = useMemo(() => {
@@ -105,6 +113,70 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
   const goToStep = (stepIndex: number) => {
     setCurrentStep(stepIndex);
   };
+
+  // Text-to-Speech functionality
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Stop any current speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9; // Slightly slower for cooking instructions
+      utterance.pitch = 1;
+      utterance.volume = 0.8;
+      
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  const speakCurrentStep = () => {
+    const step = recipe.steps[currentStep];
+    const text = `Step ${step.step}. ${step.instruction}`;
+    speak(text);
+  };
+
+  const enterStepByStepMode = () => {
+    setStepMode('step-by-step');
+    setCurrentStep(0);
+    // Welcome message when entering step-by-step mode
+    setTimeout(() => {
+      if (isAutoPlay) {
+        speak(`Welcome to step-by-step cooking mode for ${recipe.title}. Let's start with step 1.`);
+      }
+    }, 500);
+  };
+
+  // Auto-play when step changes in step-by-step mode
+  useEffect(() => {
+    if (stepMode === 'step-by-step' && isAutoPlay && recipe.steps[currentStep]) {
+      // Small delay to let the UI update
+      const timer = setTimeout(() => {
+        speakCurrentStep();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep, stepMode, isAutoPlay]);
+
+  // Clean up speech when component unmounts
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -265,7 +337,10 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 <Button
                   variant={stepMode === 'all' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setStepMode('all')}
+                  onClick={() => {
+                    setStepMode('all');
+                    stopSpeaking();
+                  }}
                   className="flex items-center gap-2"
                 >
                   <List className="w-4 h-4" />
@@ -274,11 +349,11 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 <Button
                   variant={stepMode === 'step-by-step' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setStepMode('step-by-step')}
+                  onClick={enterStepByStepMode}
                   className="flex items-center gap-2"
                 >
                   <PlayCircle className="w-4 h-4" />
-                  Step by Step
+                  Voice Guide
                 </Button>
               </div>
             </div>
@@ -295,6 +370,15 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                       <p className="text-slate-700 leading-relaxed flex-1 pt-2 font-medium text-lg">
                         {step.instruction}
                       </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => speak(`Step ${step.step}. ${step.instruction}`)}
+                        className="flex-shrink-0 mt-1 hover:bg-orange-100"
+                        disabled={isSpeaking}
+                      >
+                        <Volume2 className="w-4 h-4 text-orange-600" />
+                      </Button>
                     </div>
                     
                     {step.image && (
@@ -320,6 +404,55 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
             ) : (
               // Step-by-Step View (New)
               <div className="space-y-6">
+                {/* Voice Controls */}
+                {speechSupported ? (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Volume2 className="w-5 h-5 text-blue-600" />
+                        <span className="font-medium text-blue-800">Voice Assistant</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setIsAutoPlay(!isAutoPlay)}
+                          className={`text-xs ${isAutoPlay ? 'text-green-700 bg-green-100' : 'text-slate-600'}`}
+                        >
+                          {isAutoPlay ? 'Auto-play ON' : 'Auto-play OFF'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={isSpeaking ? stopSpeaking : speakCurrentStep}
+                          className="text-blue-600 hover:bg-blue-100"
+                        >
+                          {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    {isSpeaking && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
+                        <span className="text-sm text-blue-600">Speaking...</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                    <div className="flex items-center gap-3">
+                      <VolumeX className="w-5 h-5 text-yellow-600" />
+                      <span className="text-sm text-yellow-800">
+                        Voice features are not supported in your browser. Try Chrome, Safari, or Edge for the best experience.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Progress Indicator */}
                 <div className="bg-slate-50 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
