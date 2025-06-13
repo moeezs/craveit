@@ -6,7 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle, Volume2, VolumeX, Timer } from 'lucide-react';
+import { KitchenTimer } from '@/components/kitchen-timer';
+import { FloatingTimerManager } from '@/components/floating-timer-manager';
+import { detectTimingInText } from '@/lib/time-detection';
 
 interface RecipeDisplayProps {
   recipe: Recipe;
@@ -367,9 +370,23 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                       <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                         {step.step}
                       </div>
-                      <p className="text-slate-700 leading-relaxed flex-1 pt-2 font-medium text-lg">
-                        {step.instruction}
-                      </p>
+                      <div className="flex-1 space-y-3">
+                        <p className="text-slate-700 leading-relaxed pt-2 font-medium text-lg">
+                          {step.instruction}
+                        </p>
+                        
+                        {/* Show suggested timer only if timing is detected */}
+                        {detectTimingInText(step.instruction) && (
+                          <div className="ml-2">
+                            <KitchenTimer 
+                              stepNumber={step.step}
+                              stepText={step.instruction}
+                              suggestedTime={detectTimingInText(step.instruction)?.totalSeconds}
+                              showSuggestedOnly={true}
+                            />
+                          </div>
+                        )}
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -472,20 +489,32 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 </div>
 
                 {/* Current Step */}
-                <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-orange-200 rounded-2xl p-8 min-h-[300px]">
+                <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-orange-200 rounded-2xl p-8">
                   <div className="flex items-start gap-6 mb-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg">
                       {recipe.steps[currentStep].step}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 space-y-4">
                       <p className="text-slate-800 leading-relaxed text-xl font-medium">
                         {recipe.steps[currentStep].instruction}
                       </p>
+                      
+                      {/* Timer for current step - only if timing detected */}
+                      {detectTimingInText(recipe.steps[currentStep].instruction) && (
+                        <div className="bg-white/50 border border-slate-200 rounded-lg p-4">
+                          <KitchenTimer 
+                            stepNumber={recipe.steps[currentStep].step}
+                            stepText={recipe.steps[currentStep].instruction}
+                            suggestedTime={detectTimingInText(recipe.steps[currentStep].instruction)?.totalSeconds}
+                            showSuggestedOnly={true}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                   
                   {recipe.steps[currentStep].image && (
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mt-6">
                       <img
                         src={recipe.steps[currentStep].image}
                         alt={`Step ${recipe.steps[currentStep].step}`}

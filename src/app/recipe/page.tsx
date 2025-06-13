@@ -8,6 +8,7 @@ import { RecipeDisplay } from '@/components/recipe-display';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FloatingTimerManager } from '@/components/floating-timer-manager';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function RecipePage() {
@@ -146,6 +147,9 @@ export default function RecipePage() {
         </Button>
         
         <RecipeDisplay recipe={recipe} />
+        
+        {/* Floating Timer Manager */}
+        <FloatingTimerManager activeTimers={0} completedTimers={0} />
       </div>
     </div>
   );
