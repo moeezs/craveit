@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ChefHat, Search, AlertCircle, Sparkles, Clock, Users } from 'lucide-react';
+import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 
 export default function Home() {
   const router = useRouter();
@@ -53,7 +54,10 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-rose-50">
+    <div className="min-h-screen bg-background">
+      <div className="absolute top-4 right-4 z-50">
+        <DarkModeToggle />
+      </div>
       <div className="container mx-auto px-6 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -66,19 +70,19 @@ export default function Home() {
               CraveIt
             </h1>
           </div>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Transform any AllRecipes.com recipe into a beautiful, organized display with smart ingredient scaling.
             <br />
-            <span className="text-lg text-slate-500">Just paste the link and let the magic begin ✨</span>
+            <span className="text-lg text-muted-foreground/80">Just paste the link and let the magic begin ✨</span>
           </p>
         </div>
 
         {/* Main Input Section */}
-        <Card className="max-w-2xl mx-auto mb-16 shadow-xl border-0 bg-white/70 backdrop-blur-sm">
+        <Card className="max-w-2xl mx-auto mb-16 shadow-xl border-0">
           <CardContent className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-sm font-medium text-foreground">
                   Recipe URL
                 </label>
                 <div className="relative">
@@ -87,9 +91,9 @@ export default function Home() {
                     placeholder="https://www.allrecipes.com/recipe/..."
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="pl-12 pr-4 py-6 text-lg border-2 border-slate-200 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl"
+                    className="pl-12 pr-4 py-6 text-lg border-2 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl"
                   />
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 </div>
               </div>
               
@@ -114,21 +118,21 @@ export default function Home() {
 
         {/* Example Recipes */}
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">
+          <h2 className="text-2xl font-bold text-center text-foreground mb-8">
             ✨ Try These Popular Recipes
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {exampleRecipes.map((recipe, index) => (
               <Card 
                 key={index}
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80"
+                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-0 hover:bg-accent/50"
                 onClick={() => setUrl(recipe.url)}
               >
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-slate-800 mb-3 leading-tight">
+                  <h3 className="font-semibold text-card-foreground mb-3 leading-tight">
                     {recipe.title}
                   </h3>
-                  <div className="flex items-center gap-4 text-sm text-slate-600">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="w-4 h-4" />
                       <span>{recipe.time}</span>
@@ -151,25 +155,25 @@ export default function Home() {
         <div className="mt-20 text-center">
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="space-y-3">
-              <div className="w-12 h-12 mx-auto bg-orange-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-orange-600" />
               </div>
-              <h3 className="font-semibold text-slate-800">Beautiful Design</h3>
-              <p className="text-sm text-slate-600">Clean, modern interface that makes cooking a joy</p>
+              <h3 className="font-semibold text-foreground">Beautiful Design</h3>
+              <p className="text-sm text-muted-foreground">Clean, modern interface that makes cooking a joy</p>
             </div>
             <div className="space-y-3">
-              <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                 <Users className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-slate-800">Smart Scaling</h3>
-              <p className="text-sm text-slate-600">Automatically adjust ingredients for any number of servings</p>
+              <h3 className="font-semibold text-foreground">Smart Scaling</h3>
+              <p className="text-sm text-muted-foreground">Automatically adjust ingredients for any number of servings</p>
             </div>
             <div className="space-y-3">
-              <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="font-semibold text-slate-800">Instant Results</h3>
-              <p className="text-sm text-slate-600">Get organized recipes in seconds, not minutes</p>
+              <h3 className="font-semibold text-foreground">Instant Results</h3>
+              <p className="text-sm text-muted-foreground">Get organized recipes in seconds, not minutes</p>
             </div>
           </div>
         </div>

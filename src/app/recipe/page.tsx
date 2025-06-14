@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FloatingTimerManager } from '@/components/floating-timer-manager';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 
 export default function RecipePage() {
   const searchParams = useSearchParams();
@@ -83,7 +84,10 @@ export default function RecipePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-background">
+        <div className="absolute top-4 right-4 z-50">
+          <DarkModeToggle />
+        </div>
         <div className="container mx-auto px-6 py-8">
           <div className="mb-8">
             <Button 
@@ -103,7 +107,10 @@ export default function RecipePage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-background">
+        <div className="absolute top-4 right-4 z-50">
+          <DarkModeToggle />
+        </div>
         <div className="container mx-auto px-6 py-8">
           <Button 
             variant="ghost" 
@@ -135,7 +142,10 @@ export default function RecipePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
+      <div className="absolute top-4 right-4 z-50">
+        <DarkModeToggle />
+      </div>
       <div className="container mx-auto px-6 py-8">
         <Button 
           variant="ghost" 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CraveIt - Beautiful Recipe Display",
-  description: "Transform AllRecipes.com URLs into beautiful, organized recipe displays. Get ingredients, instructions, and nutrition info in a clean, modern interface.",
+  description:
+    "Transform AllRecipes.com URLs into beautiful, organized recipe displays. Get ingredients, instructions, and nutrition info in a clean, modern interface.",
 };
 
 export default function RootLayout({
@@ -27,7 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
