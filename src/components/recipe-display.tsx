@@ -10,6 +10,7 @@ import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, Che
 import { KitchenTimer } from '@/components/kitchen-timer';
 import { FloatingTimerManager } from '@/components/floating-timer-manager';
 import { detectTimingInText } from '@/lib/time-detection';
+import { ShoppingListDialog } from '@/components/shopping-list-dialog';
 
 interface RecipeDisplayProps {
   recipe: Recipe;
@@ -245,6 +246,10 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
         {/* Ingredients Section with Scaling */}
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardContent className="p-8">
+            {/* Shopping List Button */}
+            <div className="flex justify-end mb-4">
+              <ShoppingListDialog ingredients={scaledIngredients} />
+            </div>
             {/* Serving Size Controller */}
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
