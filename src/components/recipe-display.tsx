@@ -428,18 +428,18 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
               <div className="space-y-6">
                 {/* Voice Controls */}
                 {speechSupported ? (
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-800/30 rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Volume2 className="w-5 h-5 text-blue-600" />
-                        <span className="font-medium text-blue-800">Voice Assistant</span>
+                        <span className="font-medium text-blue-800 dark:text-blue-200">Voice Assistant</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setIsAutoPlay(!isAutoPlay)}
-                          className={`text-xs ${isAutoPlay ? 'text-green-700 bg-green-100' : 'text-slate-600'}`}
+                          className={`text-xs ${isAutoPlay ? 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30' : 'text-muted-foreground'}`}
                         >
                           {isAutoPlay ? 'Auto-play ON' : 'Auto-play OFF'}
                         </Button>
@@ -447,7 +447,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                           variant="ghost"
                           size="sm"
                           onClick={isSpeaking ? stopSpeaking : speakCurrentStep}
-                          className="text-blue-600 hover:bg-blue-100"
+                          className="text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                         >
                           {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                         </Button>
@@ -460,15 +460,15 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                           <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                           <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
-                        <span className="text-sm text-blue-600">Speaking...</span>
+                        <span className="text-sm text-blue-600 dark:text-blue-400">Speaking...</span>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                  <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800/30 rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <VolumeX className="w-5 h-5 text-yellow-600" />
-                      <span className="text-sm text-yellow-800">
+                      <span className="text-sm text-yellow-800 dark:text-yellow-200">
                         Voice features are not supported in your browser. Try Chrome, Safari, or Edge for the best experience.
                       </span>
                     </div>
@@ -476,16 +476,16 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 )}
 
                 {/* Progress Indicator */}
-                <div className="bg-slate-50 rounded-xl p-4">
+                <div className="bg-muted/50 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-600">
+                    <span className="text-sm font-medium text-muted-foreground">
                       Step {currentStep + 1} of {recipe.steps.length}
                     </span>
-                    <span className="text-sm text-slate-500">
+                    <span className="text-sm text-muted-foreground">
                       {Math.round(((currentStep + 1) / recipe.steps.length) * 100)}% Complete
                     </span>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div 
                       className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${((currentStep + 1) / recipe.steps.length) * 100}%` }}
@@ -494,7 +494,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 </div>
 
                 {/* Current Step */}
-                <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-orange-200 rounded-2xl p-8">
+                <div className="bg-gradient-to-br from-card to-muted/30 border-2 border-orange-200 dark:border-orange-800/30 rounded-2xl p-8">
                   <div className="flex items-start gap-6 mb-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-lg">
                       {recipe.steps[currentStep].step}
@@ -575,10 +575,10 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
 
                 {/* Completion Message */}
                 {currentStep === recipe.steps.length - 1 && (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                  <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-xl p-6 text-center">
                     <div className="text-2xl mb-2">🎉</div>
-                    <h3 className="font-bold text-green-800 mb-2">Congratulations!</h3>
-                    <p className="text-green-700">You've completed all the steps. Enjoy your {recipe.title}!</p>
+                    <h3 className="font-bold text-green-800 dark:text-green-200 mb-2">Congratulations!</h3>
+                    <p className="text-green-700 dark:text-green-300">You've completed all the steps. Enjoy your {recipe.title}!</p>
                   </div>
                 )}
               </div>
