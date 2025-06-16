@@ -186,12 +186,12 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Recipe Header */}
       <div className="text-center space-y-6">
-        <h1 className="text-4xl lg:text-5xl font-bold text-slate-800 leading-tight">
+        <h1 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">
           {recipe.title}
         </h1>
         
         {/* Recipe Meta Info */}
-        <div className="flex flex-wrap justify-center gap-6 text-slate-600">
+        <div className="flex flex-wrap justify-center gap-6 text-muted-foreground">
           {recipe.details.prepTime && (
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
@@ -244,7 +244,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
 
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Ingredients Section with Scaling */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        <Card className="border-0 shadow-lg">
           <CardContent className="p-8">
             {/* Shopping List Button */}
             <div className="flex justify-end mb-4">
@@ -252,13 +252,13 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
             </div>
             {/* Serving Size Controller */}
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Calculator className="w-6 h-6 text-orange-600" />
                 Ingredients
               </h2>
               
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-slate-600">Servings:</span>
+                <span className="text-sm font-medium text-muted-foreground">Servings:</span>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -271,8 +271,8 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                   </Button>
                   
                   <div className="flex items-center gap-2 min-w-[80px] justify-center">
-                    <Users className="w-4 h-4 text-slate-500" />
-                    <span className="font-bold text-lg text-slate-800">{currentServings}</span>
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-bold text-lg text-foreground">{currentServings}</span>
                   </div>
                   
                   <Button
@@ -288,8 +288,8 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
             </div>
 
             {scale !== 1 && (
-              <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <p className="text-sm text-orange-800 text-center font-medium">
+              <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800/30 rounded-lg">
+                <p className="text-sm text-orange-800 dark:text-orange-200 text-center font-medium">
                   📊 Ingredients scaled {scale > 1 ? 'up' : 'down'} by {scale.toFixed(2)}x
                   {currentServings !== originalServings && (
                     <span className="block text-xs mt-1">
@@ -306,7 +306,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                 <div key={index}>
                   {Object.keys(scaledIngredients).length > 1 && (
                     <>
-                      <h3 className="font-bold text-lg text-slate-700 mb-3">
+                      <h3 className="font-bold text-lg text-foreground mb-3">
                         {section}
                       </h3>
                       <Separator className="mb-4" />
@@ -316,7 +316,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                     {items.map((ingredient, itemIndex) => (
                       <li key={itemIndex} className="flex items-start gap-3 group">
                         <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0 group-hover:bg-orange-600 transition-colors" />
-                        <span className="text-slate-700 leading-relaxed font-medium">
+                        <span className="text-foreground leading-relaxed font-medium">
                           {ingredient}
                         </span>
                       </li>
@@ -332,10 +332,10 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
         </Card>
 
         {/* Instructions Section */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        <Card className="border-0 shadow-lg">
           <CardContent className="p-8">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <ChefHat className="w-6 h-6 text-orange-600" />
                 Instructions
               </h2>
@@ -376,7 +376,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                         {step.step}
                       </div>
                       <div className="flex-1 space-y-3">
-                        <p className="text-slate-700 leading-relaxed pt-2 font-medium text-lg">
+                        <p className="text-foreground leading-relaxed pt-2 font-medium text-lg">
                           {step.instruction}
                         </p>
                         
@@ -396,7 +396,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => speak(`Step ${step.step}. ${step.instruction}`)}
-                        className="flex-shrink-0 mt-1 hover:bg-orange-100"
+                        className="flex-shrink-0 mt-1 hover:bg-accent"
                         disabled={isSpeaking}
                       >
                         <Volume2 className="w-4 h-4 text-orange-600" />
@@ -500,13 +500,13 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                       {recipe.steps[currentStep].step}
                     </div>
                     <div className="flex-1 space-y-4">
-                      <p className="text-slate-800 leading-relaxed text-xl font-medium">
+                      <p className="text-foreground leading-relaxed text-xl font-medium">
                         {recipe.steps[currentStep].instruction}
                       </p>
                       
                       {/* Timer for current step - only if timing detected */}
                       {detectTimingInText(recipe.steps[currentStep].instruction) && (
-                        <div className="bg-white/50 border border-slate-200 rounded-lg p-4">
+                        <div className="bg-muted/50 border border-border rounded-lg p-4">
                           <KitchenTimer 
                             stepNumber={recipe.steps[currentStep].step}
                             stepText={recipe.steps[currentStep].instruction}
