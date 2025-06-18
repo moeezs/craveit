@@ -6,9 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle, Volume2, VolumeX, Timer } from 'lucide-react';
+import { Clock, Users, ChefHat, Flame, Minus, Plus, Calculator, ChevronLeft, ChevronRight, List, PlayCircle, Volume2, VolumeX } from 'lucide-react';
 import { KitchenTimer } from '@/components/kitchen-timer';
-import { FloatingTimerManager } from '@/components/floating-timer-manager';
 import { detectTimingInText } from '@/lib/time-detection';
 import { ShoppingListDialog } from '@/components/shopping-list-dialog';
 
@@ -385,7 +384,6 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                           <div className="ml-2">
                             <KitchenTimer 
                               stepNumber={step.step}
-                              stepText={step.instruction}
                               suggestedTime={detectTimingInText(step.instruction)?.totalSeconds}
                               showSuggestedOnly={true}
                             />
@@ -509,7 +507,6 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                         <div className="bg-muted/50 border border-border rounded-lg p-4">
                           <KitchenTimer 
                             stepNumber={recipe.steps[currentStep].step}
-                            stepText={recipe.steps[currentStep].instruction}
                             suggestedTime={detectTimingInText(recipe.steps[currentStep].instruction)?.totalSeconds}
                             showSuggestedOnly={true}
                           />

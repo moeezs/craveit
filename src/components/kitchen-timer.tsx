@@ -33,25 +33,24 @@ export interface TimerData {
 
 interface KitchenTimerProps {
   stepNumber?: number;
-  stepText?: string;
   suggestedTime?: number; // in seconds
   showSuggestedOnly?: boolean; // Only show if there's a suggested time
 }
 
-export function KitchenTimer({ stepNumber, stepText, suggestedTime, showSuggestedOnly = false }: KitchenTimerProps) {
+export function KitchenTimer({ stepNumber, suggestedTime, showSuggestedOnly = false }: KitchenTimerProps) {
   const [timers, setTimers] = useState<TimerData[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTimerMinutes, setNewTimerMinutes] = useState(suggestedTime ? Math.floor(suggestedTime / 60) : 10);
   const [newTimerSeconds, setNewTimerSeconds] = useState(suggestedTime ? suggestedTime % 60 : 0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<{ play: () => void } | null>(null);
 
   // Create audio context for timer completion sound
   useEffect(() => {
     // Create a simple beep sound programmatically
     const createBeepSound = () => {
       try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const audioContext = new ((window as Window & typeof globalThis).AudioContext || (window as Window & typeof globalThis & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
@@ -71,7 +70,7 @@ export function KitchenTimer({ stepNumber, stepText, suggestedTime, showSuggeste
       }
     };
     
-    audioRef.current = { play: createBeepSound } as any;
+    audioRef.current = { play: createBeepSound };
   }, []);
 
   // Main timer interval
@@ -271,7 +270,7 @@ export function KitchenTimer({ stepNumber, stepText, suggestedTime, showSuggeste
                   {timer.isCompleted && (
                     <Badge variant="destructive" className="animate-pulse">
                       <Bell className="w-3 h-3 mr-1" />
-                      Time's Up!
+                      Time&apos;s Up!
                     </Badge>
                   )}
                 </div>

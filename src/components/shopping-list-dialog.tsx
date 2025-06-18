@@ -44,7 +44,7 @@ export function ShoppingListDialog({ ingredients }: ShoppingListDialogProps) {
         </DialogHeader>
         <div className="space-y-4">
           <ul className="space-y-2 max-h-72 overflow-y-auto">
-            {allItems.map(({ section, item }, i) => (
+            {allItems.map(({ item }, i) => (
               <li key={i} className="flex items-center gap-3">
                 <button
                   aria-label={checked[i] ? "Uncheck" : "Check"}
