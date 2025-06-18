@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Image from 'next/image';
 import { Recipe } from '@/types/recipe';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -155,7 +156,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
     // Welcome message when entering step-by-step mode
     setTimeout(() => {
       if (isAutoPlay) {
-        speak(`Welcome to step-by-step cooking mode for ${recipe.title}. Let's start with step 1.`);
+        speak(`Welcome to step-by-step cooking mode for ${recipe.title}. Lets start with step 1.`);
       }
     }, 500);
   };
@@ -170,7 +171,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
       
       return () => clearTimeout(timer);
     }
-  }, [currentStep, stepMode, isAutoPlay]);
+  }, [currentStep, stepMode, isAutoPlay, recipe.steps, speakCurrentStep]);
 
   // Clean up speech when component unmounts
   useEffect(() => {
@@ -403,9 +404,11 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                     
                     {step.image && (
                       <div className="ml-14">
-                        <img
+                        <Image
                           src={step.image}
                           alt={`Step ${step.step}`}
+                          width={400}
+                          height={300}
                           className="rounded-xl w-full max-w-md object-cover shadow-md hover:shadow-lg transition-shadow"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -517,9 +520,11 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                   
                   {recipe.steps[currentStep].image && (
                     <div className="flex justify-center mt-6">
-                      <img
+                      <Image
                         src={recipe.steps[currentStep].image}
                         alt={`Step ${recipe.steps[currentStep].step}`}
+                        width={500}
+                        height={320}
                         className="rounded-xl max-w-full max-h-80 object-cover shadow-lg"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
