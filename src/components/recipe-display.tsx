@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Recipe } from '@/types/recipe';
 import { Card, CardContent } from '@/components/ui/card';
@@ -144,11 +144,11 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
     }
   };
 
-  const speakCurrentStep = () => {
+  const speakCurrentStep = useCallback(() => {
     const step = recipe.steps[currentStep];
     const text = `Step ${step.step}. ${step.instruction}`;
     speak(text);
-  };
+  }, [recipe.steps, currentStep, speak]);
 
   const enterStepByStepMode = () => {
     setStepMode('step-by-step');
@@ -580,7 +580,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
                   <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-xl p-6 text-center">
                     <div className="text-2xl mb-2">🎉</div>
                     <h3 className="font-bold text-green-800 dark:text-green-200 mb-2">Congratulations!</h3>
-                    <p className="text-green-700 dark:text-green-300">You've completed all the steps. Enjoy your {recipe.title}!</p>
+                    <p className="text-green-700 dark:text-green-300">You&apos;ve completed all the steps. Enjoy your {recipe.title}!</p>
                   </div>
                 )}
               </div>
