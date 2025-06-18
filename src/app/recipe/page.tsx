@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Recipe } from '@/types/recipe';
 import { fetchRecipe } from '@/lib/recipe-api';
@@ -12,7 +12,7 @@ import { FloatingTimerManager } from '@/components/floating-timer-manager';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { DarkModeToggle } from '@/components/ui/dark-mode-toggle';
 
-export default function RecipePage() {
+function RecipePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const url = searchParams.get('url');
@@ -162,5 +162,29 @@ export default function RecipePage() {
         <FloatingTimerManager activeTimers={0} completedTimers={0} />
       </div>
     </div>
+  );
+}
+
+export default function RecipePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 dark:from-gray-900 dark:to-gray-800">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">CraveIt</h1>
+            <DarkModeToggle />
+          </div>
+          <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-3/4 mx-auto" />
+              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-8 w-1/2 mx-auto" />
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <RecipePageContent />
+    </Suspense>
   );
 }

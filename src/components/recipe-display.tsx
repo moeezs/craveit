@@ -119,7 +119,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
   };
 
   // Text-to-Speech functionality
-  const speak = (text: string) => {
+  const speak = useCallback((text: string) => {
     if ('speechSynthesis' in window) {
       // Stop any current speech
       window.speechSynthesis.cancel();
@@ -135,7 +135,7 @@ export function RecipeDisplay({ recipe }: RecipeDisplayProps) {
       
       window.speechSynthesis.speak(utterance);
     }
-  };
+  }, []);
 
   const stopSpeaking = () => {
     if ('speechSynthesis' in window) {
